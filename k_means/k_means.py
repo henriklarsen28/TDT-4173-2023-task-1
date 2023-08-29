@@ -15,7 +15,6 @@ class KMeans:
         # (with defaults) as you see fit
         self.c0 = np.array([0, 0])
         self.c1 = np.array([1, 1])
-        print(self.c0)
         pass
         
     def fit(self, X):
@@ -33,8 +32,6 @@ class KMeans:
         # Find middle of two clusters centroid
         # Use eucledean distance to find the which category they should be in
         # Select two random spots and define them as centroids
-
-        plt.plot(self.c0[0],self.c0[1],marker="*", markersize=12)
 
         #Iterate through the code to improve position of centroids
         for i in range(4):
@@ -72,8 +69,6 @@ class KMeans:
             # Update centroid coordinates
             self.c0 = [c0_x,c0_y]
             self.c1 = [c1_x,c1_y]
-
-            plt.plot(self.c0[0], self.c0[1], marker="*", markersize=12)
 
 
 
