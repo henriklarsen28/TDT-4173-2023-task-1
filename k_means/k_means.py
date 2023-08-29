@@ -1,14 +1,21 @@
-import numpy as np 
-import pandas as pd 
+import sys
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
 # (math, random, collections, functools, etc. are perfectly fine)
 
 
 class KMeans:
-    
-    def __init__():
+
+    def __init__(self):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
+        self.c0 = [0, 0]
+        self.c1 = [1, 1]
+
         pass
         
     def fit(self, X):
@@ -20,7 +27,63 @@ class KMeans:
                 m rows (#samples) and n columns (#features)
         """
         # TODO: Implement
-        raise NotImplemented()
+        def eucledeanDistance(centroid, x_coordinate, y_coordinate):
+            x = x_coordinate - centroid[0]
+            y = y_coordinate - centroid[1]
+
+            distance = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+            return distance
+        #raise NotImplemented()
+        # https://neptune.ai/blog/k-means-clustering
+        # Find middle of two clusters centroid
+        # Use eucledean distance to find the which category they should be in
+        # Select two random spots and define them as centroids
+
+        plt.plot(self.c0[0],self.c0[1],marker="*", markersize=12)
+
+        #Iterate through the code to improve position of centroids
+        for i in range(4):
+            c0_x_nodes = []
+            c0_y_nodes = []
+            c1_x_nodes = []
+            c1_y_nodes = []
+
+            print(len(X))
+            # Loop through coordinates to find the and assign them to different nodes
+            for i in range(len(X)-1):
+                # Find min distance for point
+
+                min = sys.maxsize
+                c0_distance = eucledeanDistance(self.c0,X["x0"][i],X["x1"][i])
+                c1_distance = eucledeanDistance(self.c1, X["x0"][i], X["x1"][i])
+                if c0_distance < c1_distance:
+                    c0_x_nodes.append(X["x0"][i])
+                    c0_y_nodes.append(X["x1"][i])
+                else:
+                    c1_x_nodes.append(X["x0"][i])
+                    c1_y_nodes.append(X["x1"][i])
+
+                print("C0 %.4f" %c0_distance)
+                print("C1 %.4f" %c1_distance)
+
+            # Find mean coordinates of every node in c0 and c1 list
+            c0_x = np.mean(c0_x_nodes)
+            c0_y = np.mean(c0_y_nodes)
+
+            c1_x = np.mean(c1_x_nodes)
+            c1_y = np.mean(c1_y_nodes)
+
+
+            # Update centroid coordinates
+            self.c0 = [c0_x,c0_y]
+            self.c1 = [c1_x,c1_y]
+            plt.plot(self.c0[0], self.c0[1], marker="*", markersize=12)
+
+
+
+
+
+
     
     def predict(self, X):
         """
