@@ -19,6 +19,8 @@ X = data1[["x0", "x1"]]
 kmeans = km.KMeans()
 kmeans.fit(X)
 
+kmeans.get_centroids()
+
 
 
 plt.show()

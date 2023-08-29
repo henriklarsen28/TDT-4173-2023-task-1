@@ -13,9 +13,9 @@ class KMeans:
     def __init__(self):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        self.c0 = [0, 0]
-        self.c1 = [1, 1]
-
+        self.c0 = np.array([0, 0])
+        self.c1 = np.array([1, 1])
+        print(self.c0)
         pass
         
     def fit(self, X):
@@ -27,12 +27,7 @@ class KMeans:
                 m rows (#samples) and n columns (#features)
         """
         # TODO: Implement
-        def eucledeanDistance(centroid, x_coordinate, y_coordinate):
-            x = x_coordinate - centroid[0]
-            y = y_coordinate - centroid[1]
 
-            distance = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
-            return distance
         #raise NotImplemented()
         # https://neptune.ai/blog/k-means-clustering
         # Find middle of two clusters centroid
@@ -43,40 +38,41 @@ class KMeans:
 
         #Iterate through the code to improve position of centroids
         for i in range(4):
-            c0_x_nodes = []
-            c0_y_nodes = []
-            c1_x_nodes = []
-            c1_y_nodes = []
+            c0_nodes = np.empty((0, 2))
+            c1_nodes = np.empty((0, 2))
 
-            print(len(X))
             # Loop through coordinates to find the and assign them to different nodes
             for i in range(len(X)-1):
+
+                # Make x and y to vectors
+                x0 = np.array([X["x0"][i]- self.c0[0]])
+                y0 = np.array([X["x1"][i]- self.c0[1]])
+
+                x1 = np.array([X["x0"][i]-self.c1[0]])
+                y1 = np.array([X["x1"][i]- self.c1[1]])
+
                 # Find min distance for point
+                c0_distance = euclidean_distance(x0,y0)
+                c1_distance = euclidean_distance(x1,y1)
 
-                min = sys.maxsize
-                c0_distance = eucledeanDistance(self.c0,X["x0"][i],X["x1"][i])
-                c1_distance = eucledeanDistance(self.c1, X["x0"][i], X["x1"][i])
+                row = [X["x0"][i], X["x1"][i]]
                 if c0_distance < c1_distance:
-                    c0_x_nodes.append(X["x0"][i])
-                    c0_y_nodes.append(X["x1"][i])
+                    c0_nodes = np.vstack((c0_nodes, row))
                 else:
-                    c1_x_nodes.append(X["x0"][i])
-                    c1_y_nodes.append(X["x1"][i])
-
-                print("C0 %.4f" %c0_distance)
-                print("C1 %.4f" %c1_distance)
+                    c1_nodes = np.vstack((c1_nodes, row))
 
             # Find mean coordinates of every node in c0 and c1 list
-            c0_x = np.mean(c0_x_nodes)
-            c0_y = np.mean(c0_y_nodes)
+            c0_x = np.mean(c0_nodes[:,0])
+            c0_y = np.mean(c0_nodes[:,1])
 
-            c1_x = np.mean(c1_x_nodes)
-            c1_y = np.mean(c1_y_nodes)
+            c1_x = np.mean(c1_nodes[:,0])
+            c1_y = np.mean(c1_nodes[:,1])
 
 
             # Update centroid coordinates
             self.c0 = [c0_x,c0_y]
             self.c1 = [c1_x,c1_y]
+
             plt.plot(self.c0[0], self.c0[1], marker="*", markersize=12)
 
 
@@ -119,7 +115,9 @@ class KMeans:
             [xm_1, xm_2, ..., xm_n]
         ])
         """
-        pass
+        centroids = np.array([self.c0,self.c1])
+        return centroids
+
     
     
     
@@ -140,6 +138,7 @@ def euclidean_distance(x, y):
         A float array of shape <...> with the pairwise distances
         of each x and y point
     """
+
     return np.linalg.norm(x - y, ord=2, axis=-1)
 
 def cross_euclidean_distance(x, y=None):
