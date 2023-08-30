@@ -15,6 +15,7 @@ model_1.fit(X)
 
 # Compute Silhouette Score
 z = model_1.predict(X)
+print(z.tolist())
 print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
 print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
 

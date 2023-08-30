@@ -92,7 +92,7 @@ class KMeans:
             there are 3 clusters, then a possible assignment
             could be: array([2, 0, 0, 1, 2, 1, 1, 0, 2, 2])
         """
-        prediction = []
+        prediction = np.empty((0,1))
 
         # Classify which node belongs to which centroid
         for i in range(len(X)):   # loop through each point
@@ -108,10 +108,10 @@ class KMeans:
             c1_distance = euclidean_distance(x1, y1)
 
             if c0_distance <= c1_distance:
-                prediction.append(0)
+                prediction = np.append(prediction,0)
             else:
-                prediction.append(1)
-        return prediction
+                prediction = np.append(prediction,1)
+        return prediction.astype(int)
 
     
     def get_centroids(self):
