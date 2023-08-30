@@ -9,16 +9,23 @@ sns.set_style('darkgrid')
 data1 = pd.read_csv("data_1.csv")
 
 
-plt.figure(figsize=(5, 5))
-sns.scatterplot(x='x0', y='x1', data=data1)
-plt.xlim(0, 1); plt.ylim(0, 1);
-print(data1.describe().T)
-
 X = data1[["x0", "x1"]]
-kmeans = km.KMeans()
-kmeans.fit(X)
+model_1 = km.KMeans()
+model_1.fit(X)
 
-kmeans.get_centroids()
+# Compute Silhouette Score
+z = model_1.predict(X)
+print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
+print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
+
+# Plot cluster assignments
+C = model_1.get_centroids()
+K = len(C)
+_, ax = plt.subplots(figsize=(5, 5), dpi=100)
+plt.xlim(0,1); plt.ylim(0,1)
+sns.scatterplot(x='x0', y='x1', hue=z, hue_order=range(K), palette='tab10', data=X, ax=ax);
+sns.scatterplot(x=C[:,0], y=C[:,1], hue=range(K), palette='tab10', marker='*', s=250, edgecolor='black', ax=ax)
+ax.legend().remove();
 
 
 

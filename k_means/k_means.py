@@ -39,21 +39,20 @@ class KMeans:
             c1_nodes = np.empty((0, 2))
 
             # Loop through coordinates to find the and assign them to different nodes
-            for i in range(len(X)-1):
-
+            for i in range(len(X)):
                 # Make x and y to vectors
-                x0 = np.array([X["x0"][i]- self.c0[0]])
-                y0 = np.array([X["x1"][i]- self.c0[1]])
+                x0 = np.array([X["x0"][i], X["x1"][i]])
+                y0 = np.array([self.c0[0], self.c0[1]])
 
-                x1 = np.array([X["x0"][i]-self.c1[0]])
-                y1 = np.array([X["x1"][i]- self.c1[1]])
+                x1 = np.array([X["x0"][i], X["x1"][i]])
+                y1 = np.array([self.c1[0], self.c1[1]])
 
                 # Find min distance for point
                 c0_distance = euclidean_distance(x0,y0)
                 c1_distance = euclidean_distance(x1,y1)
 
                 row = [X["x0"][i], X["x1"][i]]
-                if c0_distance < c1_distance:
+                if c0_distance <= c1_distance:
                     c0_nodes = np.vstack((c0_nodes, row))
                 else:
                     c1_nodes = np.vstack((c1_nodes, row))
@@ -69,6 +68,7 @@ class KMeans:
             # Update centroid coordinates
             self.c0 = [c0_x,c0_y]
             self.c1 = [c1_x,c1_y]
+            self.centroids = np.array([self.c0,self.c1])
 
 
 
@@ -92,8 +92,27 @@ class KMeans:
             there are 3 clusters, then a possible assignment
             could be: array([2, 0, 0, 1, 2, 1, 1, 0, 2, 2])
         """
-        # TODO: Implement 
-        raise NotImplemented()
+        prediction = []
+
+        # Classify which node belongs to which centroid
+        for i in range(len(X)):   # loop through each point
+            # Make x and y to vectors
+            x0 = np.array([X["x0"][i], X["x1"][i]])
+            y0 = np.array([self.c0[0], self.c0[1]])
+
+            x1 = np.array([X["x0"][i], X["x1"][i]])
+            y1 = np.array([self.c1[0], self.c1[1]])
+
+            # Find min distance for point
+            c0_distance = euclidean_distance(x0, y0)
+            c1_distance = euclidean_distance(x1, y1)
+
+            if c0_distance <= c1_distance:
+                prediction.append(0)
+            else:
+                prediction.append(1)
+        return prediction
+
     
     def get_centroids(self):
         """
@@ -110,8 +129,7 @@ class KMeans:
             [xm_1, xm_2, ..., xm_n]
         ])
         """
-        centroids = np.array([self.c0,self.c1])
-        return centroids
+        return self.centroids
 
     
     
