@@ -30,7 +30,7 @@ z = model_1.predict(X)
 X = scaler.inverse_transform(X)
 
 
-#print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
+print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
 print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
 
 # Plot cluster assignments

@@ -57,7 +57,7 @@ class KMeans:
         candidate_centroids = np.empty((0, 2))
         best_silhouette = 0
         best_centroids = None
-        for i in range(5):
+        for i in range(6):
 
 
             # self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
@@ -69,11 +69,11 @@ class KMeans:
             #print(self.centroids)
 
             # Iterate through the code to improve position of centroids
-            for i in range(4):
+            for i in range(3):
                 c0_nodes = np.empty((0, 3))
                 c1_nodes = np.empty((0, 3))
-                c0_mean = 0
-                c1_mean = 0
+
+
                 # Loop through coordinates to find the and assign them to different nodes
                 for i in range(len(X)):
                     # Make x and y to vectors
@@ -90,23 +90,12 @@ class KMeans:
                     c0_distance = euclidean_distance(y0, x0)
                     c1_distance = euclidean_distance(y1, x1)
 
-                    try:
-                        c0_mean = np.median(c0_nodes[:, 2])
-                        c1_mean = np.median(c1_nodes[:, 2])
-                    except:
-                        c0_mean = 0
-                        c1_mean = 0
-
-                    # Calculate the sum of squares and append to list
-                    c0_sum = np.sum(c0_nodes[:, 2]-c0_mean)
-                    c1_sum = np.sum(c1_nodes[:, 2]-c1_mean)
-                    node = np.min([c0_sum, c1_sum])
-
+                    row = [X[i][0], X[i][1]]
                     if c0_distance < c1_distance:
-                        row = [X[i][0], X[i][1], c0_distance]
+                        row = [X[i][0], X[i][1]]
                         c0_nodes = np.vstack((c0_nodes, row))
                     elif c0_distance > c1_distance:
-                        row = [X[i][0], X[i][1], c1_distance]
+
                         c1_nodes = np.vstack((c1_nodes, row))
 
 
@@ -120,12 +109,6 @@ class KMeans:
 
                 c1_x = np.mean(c1_nodes[:, 0])
                 c1_y = np.mean(c1_nodes[:, 1])
-                #print(minDistance0)
-                #print(np.median(c0_nodes[:, 2]))
-                #Remove the nodes over the mean distance + 10%
-                #c0_nodes = c0_nodes[c0_nodes[:, 2] < np.mean(c0_nodes[:, 2])*1.4]
-                #c1_nodes = c1_nodes[c1_nodes[:, 2] < np.mean(c1_nodes[:, 2])*1.4]
-                #print(c0_nodes)
 
 
 
@@ -144,10 +127,6 @@ class KMeans:
 
 
 
-                # Plot the centroids
-                #ax.scatter(c0[0], c0[1], c='r', marker='x', s=100)
-                #ax.scatter(c1[0], c1[1], c='b', marker='x', s=100)
-                #plt.show()
         self.centroids = best_centroids
 
 
