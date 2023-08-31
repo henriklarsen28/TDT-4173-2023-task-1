@@ -21,13 +21,11 @@ data_2 = pd.read_csv('data_2.csv')
 X = data_2[["x0", "x1"]]
 X = scaler.fit_transform(X)
 
-model_2 = km.KMeans(2)  # <-- Feel free to add hyperparameters
+model_2 = km.KMeans(8,10)  # <-- Feel free to add hyperparameters
 model_2.fit(X)
 
 
-#model = kmeans.KMeans(n_clusters=2)
-#model.fit(X)
-#z = model.predict(X)
+print(c)
 
 # Compute Silhouette Score
 z = model_2.predict(X)

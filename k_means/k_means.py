@@ -9,11 +9,11 @@ import math
 
 class KMeans:
 
-    def __init__(self, number_of_clusters):
+    def __init__(self, number_of_clusters, number_of_iterations=20):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
         self.number_of_clusters = number_of_clusters
-        self.max_iters= 100
+        self.number_of_iterations = number_of_iterations
         pass
 
     def kmeans_plusplus_inizialization(self, X, num_clusters):
@@ -33,7 +33,6 @@ class KMeans:
 
             next_centroid = np.random.choice(X_np.shape[0], p=probabilities)
             centroids.append(X_np[next_centroid])
-        #print("Centroids ", centroids)
         return centroids
 
     def fit(self, X):
@@ -44,23 +43,19 @@ class KMeans:
             X (array<m,n>): a matrix of floats with
                 m rows (#samples) and n columns (#features)
         """
+
+
         # https://neptune.ai/blog/k-means-clustering
-        # Find middle of two clusters centroid
-        # Use eucledean distance to find the which category they should be in
-        # Select two random spots and define them as centroids
-        # self.c0 = np.array([0, 0])
-        # self.c1 = np.array([1, 1])
-        # self.centroids = np.array([self.c0, self.c1])
-        #print(X.shape)
+
         # self.centroids = X[np.random.choice(X.shape[0], self.number_of_clusters, replace=False)]
         X_np = np.asarray(X)
         candidate_centroids = np.empty((0, 2))
         best_silhouette = 0
         best_centroids = None
-        for i in range(6):
+        for i in range(self.number_of_iterations):
 
 
-            # self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
+            #self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
             self.centroids = KMeans.kmeans_plusplus_inizialization(self, X_np, self.number_of_clusters)
             #self.centroids = np.array([[40,1],[45,7]])
 
@@ -69,56 +64,22 @@ class KMeans:
             #print(self.centroids)
 
             # Iterate through the code to improve position of centroids
-            for i in range(3):
-                c0_nodes = np.empty((0, 3))
-                c1_nodes = np.empty((0, 3))
-
+            for i in range(5):
+                cluster_nodes = [np.empty((0, X.shape[1])) for _ in range(self.number_of_clusters)]
 
                 # Loop through coordinates to find the and assign them to different nodes
                 for i in range(len(X)):
-                    # Make x and y to vectors
+                    # Find the closest centroid and insert node into that list
+                    closest_centroid = self.closestCentroid(X[i])
+                    cluster_nodes[closest_centroid] = np.vstack((cluster_nodes[closest_centroid],X[i]))
 
-
-                    #print(X_np2)
-                    x0 = np.array([X[i][0], X[i][1]])
-                    y0 = self.centroids[0]
-
-                    x1 = np.array([X[i][0], X[i][1]])
-                    y1 = self.centroids[1]
-
-                    # Find min distance for point
-                    c0_distance = euclidean_distance(y0, x0)
-                    c1_distance = euclidean_distance(y1, x1)
-
-                    row = [X[i][0], X[i][1]]
-                    if c0_distance < c1_distance:
-                        row = [X[i][0], X[i][1]]
-                        c0_nodes = np.vstack((c0_nodes, row))
-                    elif c0_distance > c1_distance:
-
-                        c1_nodes = np.vstack((c1_nodes, row))
-
-
-                # Find mean coordinates of every node in c0 and c1 list
-                # TODO: Sort after distance and remove the top
-
-                # TODO: Print after every iteration
-
-                c0_x = np.mean(c0_nodes[:, 0])
-                c0_y = np.mean(c0_nodes[:, 1])
-
-                c1_x = np.mean(c1_nodes[:, 0])
-                c1_y = np.mean(c1_nodes[:, 1])
-
-
-
-                # Update centroid coordinates
-                c0 = [c0_x, c0_y]
-                c1 = [c1_x, c1_y]
+                # Calculate mean of each cluster
+                for j in range(self.number_of_clusters):
+                    #Find the new centroid
+                    new_centroid = np.mean(cluster_nodes[j], axis=0)
+                    self.centroids[j] = new_centroid
 
                 #_, ax = plt.subplots(figsize=(5, 5), dpi=100)
-
-                self.centroids = np.array([c0, c1])
 
                 silhouette = euclidean_silhouette(X, KMeans.predict(self, X))
                 if silhouette > best_silhouette:
@@ -129,8 +90,10 @@ class KMeans:
 
         self.centroids = best_centroids
 
+    def closestCentroid(self, node):
+        distances = [euclidean_distance(node, centroid) for centroid in self.centroids]
+        return np.argmin(distances)
 
-    
     def predict(self, X):
         """
         Generates predictions
@@ -151,21 +114,10 @@ class KMeans:
         # Classify which node belongs to which centroid
         for i in range(len(X)):   # loop through each point
             # Make x and y to vectors
-            x0 = np.array([X[i][0], X[i][1]])
-            y0 = self.centroids[0]
+                # Find the closest centroid and insert node into that listn ra
+            prediction = np.append(prediction, self.closestCentroid(X[i]))
 
-            x1 = np.array([X[i][0], X[i][1]])
-            y1 = self.centroids[1]
-
-            # Find min distance for point
-            c0_distance = euclidean_distance(y0, x0)
-            c1_distance = euclidean_distance(y1, x1)
-
-            if c0_distance < c1_distance:
-                prediction = np.append(prediction,0)
-            else:
-                prediction = np.append(prediction,1)
-
+        #print(prediction)
         return prediction.astype(int)
 
     

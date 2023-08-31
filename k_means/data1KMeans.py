@@ -17,6 +17,8 @@ data_1 = pd.read_csv('data_1.csv')
 X = data_1[["x0", "x1"]]
 X = scaler.fit_transform(X)
 
+# Normalize data
+#X = (X - X-np.mean(axis=0))/X.std(axis=0)
 model_1 = km.KMeans(2)  # <-- Feel free to add hyperparameters
 model_1.fit(X)
 
@@ -30,7 +32,7 @@ z = model_1.predict(X)
 X = scaler.inverse_transform(X)
 
 
-print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
+#print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
 print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
 
 # Plot cluster assignments
