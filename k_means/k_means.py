@@ -14,25 +14,24 @@ class KMeans:
         # (with defaults) as you see fit
         self.number_of_clusters = number_of_clusters
         self.number_of_iterations = number_of_iterations
+        self.centroids = None
         pass
 
-    def kmeans_plusplus_inizialization(self, X, num_clusters):
+    def kmeans_plusplus_inizialization(self, X):
         centroids = []
 
-        # Convert X to np
-        X_np = np.asarray(X)
         # Choose random centroid at first
-        first_centroid = np.random.choice(X_np.shape[0])
+        first_centroid = np.random.choice(X.shape[0])
 
-        centroids.append(X_np[first_centroid])
+        centroids.append(X[first_centroid])
 
-        for _ in range(1, num_clusters):
-            distances = np.array([np.min(np.linalg.norm(centroid - centroids, axis=1)) ** 2 for centroid in X_np])
+        for _ in range(1, self.number_of_clusters):
+            distances = np.array([np.min(np.linalg.norm(centroid - centroids, axis=1)) ** 2 for centroid in X])
             total_distance = np.sum(distances)
             probabilities = distances / total_distance
 
-            next_centroid = np.random.choice(X_np.shape[0], p=probabilities)
-            centroids.append(X_np[next_centroid])
+            next_centroid = np.random.choice(X.shape[0], p=probabilities)
+            centroids.append(X[next_centroid])
         return centroids
 
     def fit(self, X):
@@ -44,24 +43,22 @@ class KMeans:
                 m rows (#samples) and n columns (#features)
         """
 
-
         # https://neptune.ai/blog/k-means-clustering
 
         # self.centroids = X[np.random.choice(X.shape[0], self.number_of_clusters, replace=False)]
-        X_np = np.asarray(X)
-        candidate_centroids = np.empty((0, 2))
+        #X_np = np.asarray(X)
+
+        # Initialize best centroids and silhouette variables
         best_silhouette = 0
         best_centroids = None
+
+        # Iterate through the code to improve position of centroids
         for i in range(self.number_of_iterations):
 
-
+            # Initialize centroids using kmeans++, comment out if you want to use random centroids
             #self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
-            self.centroids = KMeans.kmeans_plusplus_inizialization(self, X_np, self.number_of_clusters)
-            #self.centroids = np.array([[40,1],[45,7]])
+            self.centroids = KMeans.kmeans_plusplus_inizialization(self, X)
 
-            #print(self.centroids)
-
-            #print(self.centroids)
 
             # Iterate through the code to improve position of centroids
             for i in range(5):
@@ -79,14 +76,11 @@ class KMeans:
                     new_centroid = np.mean(cluster_nodes[j], axis=0)
                     self.centroids[j] = new_centroid
 
-                #_, ax = plt.subplots(figsize=(5, 5), dpi=100)
-
+                # Finds the best silhouette score and stores the centroids
                 silhouette = euclidean_silhouette(X, KMeans.predict(self, X))
                 if silhouette > best_silhouette:
                     best_silhouette = silhouette
                     best_centroids = self.centroids
-
-
 
         self.centroids = best_centroids
 
@@ -113,8 +107,8 @@ class KMeans:
         prediction = np.empty((0,1))
         # Classify which node belongs to which centroid
         for i in range(len(X)):   # loop through each point
-            # Make x and y to vectors
-                # Find the closest centroid and insert node into that listn ra
+
+            # Find the closest centroid and insert centroid index into prediction array
             prediction = np.append(prediction, self.closestCentroid(X[i]))
 
         #print(prediction)
@@ -136,7 +130,7 @@ class KMeans:
             [xm_1, xm_2, ..., xm_n]
         ])
         """
-        return self.centroids
+        return np.asarray(self.centroids)
 
     
     
