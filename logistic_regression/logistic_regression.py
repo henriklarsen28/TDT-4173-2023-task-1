@@ -8,16 +8,26 @@ import pandas as pd
 
 class LogisticRegression:
     
-    def __init__(self, iterations=200):
+    def __init__(self, iterations=200, input_dimension=2):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
 
         self.iterations = iterations
         self.learning_rate = 0.01
         self.regularization = 0.1
-        self.b = 0
+        self.input_dimension = input_dimension
 
-        
+    def preprocess(self, X):
+        X = pd.DataFrame(X) # Convert to pandas dataframe since it came as numpy array
+        number_of_samples, number_of_features = X.shape
+
+        for i in range(2, self.input_dimension + 1):
+            for j in range(number_of_features):
+                column = X.columns[j]
+                X[str(column) + "^" + str(i)] = X[column] ** i
+        X = np.c_[np.ones(number_of_samples), X]
+        return X
+
     def fit(self, X, y):
         """
         Estimates parameters for the classifier
@@ -29,44 +39,32 @@ class LogisticRegression:
                 m binary 0.0/1.0 labels
         """
 
+
+        # Add bias column
+        X = self.preprocess(X)
         number_of_samples, number_of_features = X.shape
 
         # Add extra column of ones for bias
-        best_accuracy = 0
+        self.w = np.random.randn(number_of_features) * 0.01
+        # Gradient descent
+        for i in range(self.iterations):
+            linear_model = np.dot(X, self.w)
+            y_pred = sigmoid(linear_model)
 
-        self.w = np.random.randn(number_of_features+1) * 0.01
+            # Calculate gradients for logic regression
+            #dw = 1 / number_of_samples * np.sum(np.dot(X.T, (y_pred - y)))
+            #db = 2/number_of_samples * np.sum(y_pred - y)
 
-        # Add bias column
-        X = np.c_[np.ones(number_of_samples), np.array(X)]
-
-
-        for _ in range(1):
-            # Initialize weights and bias
-
-            #X = np.c_[np.ones(number_of_features), np.array(X)]
-            #print("w: ",self.w.shape)
-            # Gradient descent
-            for i in range(self.iterations):
-                linear_model = np.dot(X, self.w)
-                y_pred = sigmoid(linear_model)
-
-                # Calculate gradients for logic regression
-                dw = 2 * np.sum(np.matmul(X.T, (y_pred - y)))
-                db = 2 * np.sum(y_pred - y)
-
-                W = np.diag(y_pred * (np.repeat(1, len(y_pred)) - y_pred))
-                inf_mat = np.matmul(np.transpose(X), np.matmul(W, X))
-                inv_mat = np.linalg.inv(np.linalg.cholesky(inf_mat))
-
-                print("dw: ",dw)
-                print("db: ",db)
+            error = y_pred - y
+            loss_mean_square = np.dot(error, X)
+            #print("db: ",db)
 
 
-                #db = np.dot(X,(y_pred - y))
+            #db = np.dot(X,(y_pred - y))
 
-                # Update weights and bias
-                self.w = self.w - self.learning_rate * np.dot(X, dw.T)
-                self.b = self.b - self.learning_rate * db
+            # Update weights and bias
+            self.w = self.w - self.learning_rate * loss_mean_square
+            #self.b = self.b - self.learning_rate * db
 
 
 
@@ -84,8 +82,8 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        X = np.c_[np.ones(len(X)), np.array(X)]
-        linear_model = np.matmul(X, self.w)
+        X = self.preprocess(X)
+        linear_model = np.dot(X, self.w)
         y_pred = sigmoid(linear_model)
         #y_pred_class = [1 if i > 0.5 else 0 for i in y_pred]
         #print("Test ",y_pred_class)

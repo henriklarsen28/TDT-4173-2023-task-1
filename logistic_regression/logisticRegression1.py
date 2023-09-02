@@ -8,21 +8,15 @@ from sklearn.linear_model import LogisticRegression
 import logistic_regression as lr
 
 data_1 = pd.read_csv('data_1.csv')
-#data_1 = datasets.load_breast_cancer()
+
+
 # Partition data into independent (feature) and depended (target) variables
-print(data_1)
 X = data_1[['x0', 'x1']]
 y = data_1['y']
 
-# Standardizing
-X_mean = np.mean(X, axis=0)
-X_std = np.std(X, axis=0)
-
-X = (X - X_mean) / X_std
-
 
 # Create and train model.
-model_1 = lr.LogisticRegression() # <-- Should work with default constructor
+model_1 = lr.LogisticRegression(iterations=100,input_dimension=2) # <-- Should work with default constructor
 model_1.fit(X, y)
 
 # Calculate accuracy and cross entropy for (insample) predictions
