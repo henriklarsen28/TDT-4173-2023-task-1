@@ -1,4 +1,6 @@
-import numpy as np 
+import random
+
+import numpy as np
 import pandas as pd 
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
 # (math, random, collections, functools, etc. are perfectly fine)
@@ -6,10 +8,15 @@ import pandas as pd
 
 class LogisticRegression:
     
-    def __init__():
+    def __init__(self, iterations=200):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        pass
+
+        self.iterations = iterations
+        self.learning_rate = 0.01
+        self.regularization = 0.1
+        self.b = 0
+
         
     def fit(self, X, y):
         """
@@ -21,13 +28,52 @@ class LogisticRegression:
             y (array<m>): a vector of floats containing 
                 m binary 0.0/1.0 labels
         """
-        # TODO: Implement
-        raise NotImplemented()
-    
+
+        number_of_samples, number_of_features = X.shape
+
+        # Add extra column of ones for bias
+        best_accuracy = 0
+
+        self.w = np.random.randn(number_of_features+1) * 0.01
+
+        # Add bias column
+        X = np.c_[np.ones(number_of_samples), np.array(X)]
+
+
+        for _ in range(1):
+            # Initialize weights and bias
+
+            #X = np.c_[np.ones(number_of_features), np.array(X)]
+            #print("w: ",self.w.shape)
+            # Gradient descent
+            for i in range(self.iterations):
+                linear_model = np.dot(X, self.w)
+                y_pred = sigmoid(linear_model)
+
+                # Calculate gradients for logic regression
+                dw = 2 * np.sum(np.matmul(X.T, (y_pred - y)))
+                db = 2 * np.sum(y_pred - y)
+
+                W = np.diag(y_pred * (np.repeat(1, len(y_pred)) - y_pred))
+                inf_mat = np.matmul(np.transpose(X), np.matmul(W, X))
+                inv_mat = np.linalg.inv(np.linalg.cholesky(inf_mat))
+
+                print("dw: ",dw)
+                print("db: ",db)
+
+
+                #db = np.dot(X,(y_pred - y))
+
+                # Update weights and bias
+                self.w = self.w - self.learning_rate * np.dot(X, dw.T)
+                self.b = self.b - self.learning_rate * db
+
+
+
     def predict(self, X):
         """
         Generates predictions
-        
+
         Note: should be called after .fit()
         
         Args:
@@ -38,8 +84,12 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        # TODO: Implement
-        raise NotImplemented()
+        X = np.c_[np.ones(len(X)), np.array(X)]
+        linear_model = np.matmul(X, self.w)
+        y_pred = sigmoid(linear_model)
+        #y_pred_class = [1 if i > 0.5 else 0 for i in y_pred]
+        #print("Test ",y_pred_class)
+        return y_pred
         
 
         
