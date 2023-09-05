@@ -18,6 +18,7 @@ class KMeans:
         self.tolerance = tolerance
         pass
 
+    # Kmeans++ initialization, used chatgpt for inspiration
     def kmeans_plusplus_inizialization(self, X, k):
         centroids = []
 
@@ -43,7 +44,7 @@ class KMeans:
             X (array<m,n>): a matrix of floats with
                 m rows (#samples) and n columns (#features)
         """
-
+        # Got the pseudocode for the algorithm from here:
         # https://neptune.ai/blog/k-means-clustering
 
         # Initialize best centroids and silhouette variables
@@ -56,19 +57,18 @@ class KMeans:
         start = self.number_of_clusters
         end = self.number_of_clusters+1
         if self.number_of_clusters == 0:
-            start = self.number_of_clusters
+            start = 1
             end = 12
         for k in range(start, end):
             # Iterate through the code to improve position of centroids
-            for _ in range(self.number_of_iterations):
+            for _ in range(self.number_of_iterations//5):
 
                 # Initialize centroids using kmeans++, comment out if you want to use random centroids
-                #self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
                 self.centroids = KMeans.kmeans_plusplus_inizialization(self, X,k)
                 last_centroid = np.random.randn(k, 2)
 
                 # Iterate through the code to improve position of centroids
-                for j in range(5):
+                for j in range(self.number_of_iterations//4):
                     cluster_nodes = [np.empty((0, X.shape[1])) for _ in range(k)]
 
                     # Loop through coordinates to find the and assign them to different nodes
@@ -256,6 +256,5 @@ def euclidean_silhouette(X, z):
     # Smallest inter distance 
     inf_mask = np.where(z[:, None] == clusters[None], np.inf, 0)
     b = (D + inf_mask).min(axis=1)
-    
     return np.mean((b - a) / np.maximum(a, b))
   

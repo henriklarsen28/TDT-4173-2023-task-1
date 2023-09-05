@@ -54,12 +54,15 @@ class LogisticRegression:
 
             # Loss mean square algorithm
             error = y_pred - y
-            print(error)
             loss_mean_square = np.dot(error, X)
 
-
+            temp = self.w
             # Update weights and bias
             self.w = self.w - self.learning_rate * loss_mean_square
+
+            # Check if weights are not changing anymore
+            if np.allclose(temp, self.w, rtol=self.tolerance):
+                break
 
 
 
@@ -80,8 +83,7 @@ class LogisticRegression:
         X = self.preprocess(X)
         linear_model = np.dot(X, self.w)
         y_pred = sigmoid(linear_model)
-        #y_pred_class = [1 if i > 0.5 else 0 for i in y_pred]
-        #print("Test ",y_pred_class)
+
         return y_pred
         
 
