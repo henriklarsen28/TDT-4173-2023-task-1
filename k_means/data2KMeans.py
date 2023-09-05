@@ -25,13 +25,13 @@ X = (X-X_mean)/X_std
 
 
 # Initialize and fit model
-model_2 = km.KMeans(8,10)  # <-- Feel free to add hyperparameters
+model_2 = km.KMeans(8)  # <-- Feel free to add hyperparameters
 model_2.fit(X)
 
 # Compute Silhouette Score
 z = model_2.predict(X)
 
-#print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
+print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
 print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
 
 # Inverse normalize

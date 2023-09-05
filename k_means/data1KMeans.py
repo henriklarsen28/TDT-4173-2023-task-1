@@ -22,7 +22,7 @@ model_1.fit(X)
 z = model_1.predict(X)
 
 # Compute Silhouette Score
-#print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
+print(f'Distortion: {km.euclidean_distortion(X, z) :.3f}')
 print(f'Silhouette Score: {km.euclidean_silhouette(X, z) :.3f}')
 
 # Get centroids

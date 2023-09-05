@@ -8,7 +8,7 @@ import pandas as pd
 
 class LogisticRegression:
     
-    def __init__(self, iterations=200, input_dimension=2):
+    def __init__(self, iterations=200, input_dimension=2, tolerance=0.0001):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
 
@@ -16,6 +16,7 @@ class LogisticRegression:
         self.learning_rate = 0.01
         self.regularization = 0.1
         self.input_dimension = input_dimension
+        self.tolerance = tolerance
 
     def preprocess(self, X):
         X = pd.DataFrame(X) # Convert to pandas dataframe since it came as numpy array
@@ -51,20 +52,14 @@ class LogisticRegression:
             linear_model = np.dot(X, self.w)
             y_pred = sigmoid(linear_model)
 
-            # Calculate gradients for logic regression
-            #dw = 1 / number_of_samples * np.sum(np.dot(X.T, (y_pred - y)))
-            #db = 2/number_of_samples * np.sum(y_pred - y)
-
+            # Loss mean square algorithm
             error = y_pred - y
+            print(error)
             loss_mean_square = np.dot(error, X)
-            #print("db: ",db)
 
-
-            #db = np.dot(X,(y_pred - y))
 
             # Update weights and bias
             self.w = self.w - self.learning_rate * loss_mean_square
-            #self.b = self.b - self.learning_rate * db
 
 
 

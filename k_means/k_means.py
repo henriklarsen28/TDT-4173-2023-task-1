@@ -9,15 +9,16 @@ import math
 
 class KMeans:
 
-    def __init__(self, number_of_clusters, number_of_iterations=20):
+    def __init__(self, number_of_clusters = 0, number_of_iterations=20, tolerance= 0.002):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
         self.number_of_clusters = number_of_clusters
         self.number_of_iterations = number_of_iterations
         self.centroids = None
+        self.tolerance = tolerance
         pass
 
-    def kmeans_plusplus_inizialization(self, X):
+    def kmeans_plusplus_inizialization(self, X, k):
         centroids = []
 
         # Choose random centroid at first
@@ -25,7 +26,7 @@ class KMeans:
 
         centroids.append(X[first_centroid])
 
-        for _ in range(1, self.number_of_clusters):
+        for _ in range(1, k):
             distances = np.array([np.min(np.linalg.norm(centroid - centroids, axis=1)) ** 2 for centroid in X])
             total_distance = np.sum(distances)
             probabilities = distances / total_distance
@@ -45,44 +46,71 @@ class KMeans:
 
         # https://neptune.ai/blog/k-means-clustering
 
-        # self.centroids = X[np.random.choice(X.shape[0], self.number_of_clusters, replace=False)]
-        #X_np = np.asarray(X)
-
         # Initialize best centroids and silhouette variables
         best_silhouette = 0
+        best_distorion = 99999
         best_centroids = None
 
-        # Iterate through the code to improve position of centroids
-        for i in range(self.number_of_iterations):
+        best_number_of_clusters = 2
 
-            # Initialize centroids using kmeans++, comment out if you want to use random centroids
-            #self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
-            self.centroids = KMeans.kmeans_plusplus_inizialization(self, X)
-
-
+        start = self.number_of_clusters
+        end = self.number_of_clusters+1
+        if self.number_of_clusters == 0:
+            start = self.number_of_clusters
+            end = 12
+        for k in range(start, end):
             # Iterate through the code to improve position of centroids
-            for i in range(5):
-                cluster_nodes = [np.empty((0, X.shape[1])) for _ in range(self.number_of_clusters)]
+            for _ in range(self.number_of_iterations):
 
-                # Loop through coordinates to find the and assign them to different nodes
-                for i in range(len(X)):
-                    # Find the closest centroid and insert node into that list
-                    closest_centroid = self.closestCentroid(X[i])
-                    cluster_nodes[closest_centroid] = np.vstack((cluster_nodes[closest_centroid],X[i]))
+                # Initialize centroids using kmeans++, comment out if you want to use random centroids
+                #self.centroids = X_np[np.random.choice(X_np.shape[0], self.number_of_clusters, replace=False)]
+                self.centroids = KMeans.kmeans_plusplus_inizialization(self, X,k)
+                last_centroid = np.random.randn(k, 2)
 
-                # Calculate mean of each cluster
-                for j in range(self.number_of_clusters):
-                    #Find the new centroid
-                    new_centroid = np.mean(cluster_nodes[j], axis=0)
-                    self.centroids[j] = new_centroid
+                # Iterate through the code to improve position of centroids
+                for j in range(5):
+                    cluster_nodes = [np.empty((0, X.shape[1])) for _ in range(k)]
 
-                # Finds the best silhouette score and stores the centroids
-                silhouette = euclidean_silhouette(X, KMeans.predict(self, X))
-                if silhouette > best_silhouette:
-                    best_silhouette = silhouette
-                    best_centroids = self.centroids
+                    # Loop through coordinates to find the and assign them to different nodes
+                    for i in range(len(X)):
+                        # Find the closest centroid and insert node into that list
+                        closest_centroid = self.closestCentroid(X[i])
+                        cluster_nodes[closest_centroid] = np.vstack((cluster_nodes[closest_centroid],X[i]))
+
+                    # Calculate mean of each cluster
+                    for j in range(k):
+                        #Find the new centroid
+                        new_centroid = np.mean(cluster_nodes[j], axis=0)
+                        self.centroids[j] = new_centroid
+
+                    # Finds the best silhouette score and stores the centroids
+                    prediction = KMeans.predict(self, X)
+
+                    distortion = euclidean_distortion(X, prediction)
+                    if distortion < best_distorion:
+                        silhouette = euclidean_silhouette(X, prediction)
+                        if silhouette > best_silhouette:
+                            best_silhouette = silhouette
+                            best_distorion = distortion
+                            best_centroids = self.centroids
+                            best_number_of_clusters = k
+
+                    # Check if the centroids have hit the tolerance
+                    tol = self.calculateTolerance(last_centroid, self.centroids)
+                    last_centroid = self.centroids
+                    if tol <= self.tolerance:
+                        self.centroids = best_centroids
+                        break
+        # Updates the number of clusters
+        if self.number_of_clusters == 0:
+                self.number_of_clusters = best_number_of_clusters
 
         self.centroids = best_centroids
+    def calculateTolerance(self, last_centroids, centroids):
+        last_centroids = np.asarray(last_centroids)
+        centroids = np.asarray(centroids)
+        return np.linalg.norm(centroids - last_centroids)
+
 
     def closestCentroid(self, node):
         distances = [euclidean_distance(node, centroid) for centroid in self.centroids]
@@ -187,7 +215,7 @@ def euclidean_distortion(X, z):
     for i, c in enumerate(clusters):
         Xc = X[z == c]
         mu = Xc.mean(axis=0)
-        distortion += ((Xc - mu) ** 2).sum(axis=1)
+        distortion += ((Xc - mu) ** 2).sum()
         
     return distortion
 
