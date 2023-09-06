@@ -52,13 +52,12 @@ class LogisticRegression:
             linear_model = np.dot(X, self.w)
             y_pred = sigmoid(linear_model)
 
-            # Loss mean square algorithm
-            error = y_pred - y
-            loss_mean_square = np.dot(error, X)
+            # Gradient
+            dw = 2 * np.dot(X.T, y_pred - y)
 
             temp = self.w
-            # Update weights and bias
-            self.w = self.w - self.learning_rate * loss_mean_square
+            # Update weights using gradient descent with gradient descent
+            self.w = self.w - self.learning_rate * dw
 
             # Check if weights are not changing anymore
             if np.allclose(temp, self.w, rtol=self.tolerance):
