@@ -1,8 +1,6 @@
-import numpy
+
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import math
+
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
 # (math, random, collections, functools, etc. are perfectly fine)
 
@@ -61,7 +59,7 @@ class KMeans:
             end = 12
         for k in range(start, end):
             # Iterate through the code to improve position of centroids
-            for _ in range(self.number_of_iterations//5):
+            for _ in range(self.number_of_iterations//3):
 
                 # Initialize centroids using kmeans++, comment out if you want to use random centroids
                 self.centroids = KMeans.kmeans_plusplus_inizialization(self, X,k)
@@ -113,7 +111,7 @@ class KMeans:
 
 
     def closestCentroid(self, node):
-        distances = [euclidean_distance(node, centroid) for centroid in self.centroids]
+        distances = [euclidean_distance(node, centroid)**2 for centroid in self.centroids]
         return np.argmin(distances)
 
     def predict(self, X):
