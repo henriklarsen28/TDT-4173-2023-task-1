@@ -54,13 +54,14 @@ class LogisticRegression:
 
             # Gradient
             dw = 2 * np.dot(X.T, y_pred - y)
-
-            temp = self.w
+            
+            # Old weights
+            oldW = self.w
             # Update weights using gradient descent with gradient descent
             self.w = self.w - self.learning_rate * dw
 
             # Check if weights are not changing anymore
-            if np.allclose(temp, self.w, rtol=self.tolerance):
+            if np.allclose(oldW, self.w, rtol=self.tolerance):
                 break
 
 
